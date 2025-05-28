@@ -1,0 +1,34 @@
+syntax = "proto3";
+
+package feroxdb;
+
+service FeroxDB {
+  rpc Set (SetRequest) returns (SetResponse);
+  rpc Get (GetRequest) returns (GetResponse);
+  rpc Save (SaveRequest) returns (SaveResponse);
+}
+
+message SetRequest {
+  string key = 1;
+  string value = 2;
+  uint64 ttl = 3;
+}
+
+message SetResponse {
+  string status = 1;
+}
+
+message GetRequest {
+  string key = 1;
+}
+
+message GetResponse {
+  string value = 1;
+  bool found = 2;
+}
+
+message SaveRequest {}
+
+message SaveResponse {
+  string status = 1;
+}

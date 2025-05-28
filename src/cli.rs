@@ -9,6 +9,7 @@ pub struct Cli {
 
 #[derive(Subcommand)]
 pub enum Commands {
+    Start,
     Set {
         key: String,
         value: String,

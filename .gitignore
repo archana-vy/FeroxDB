@@ -19,3 +19,8 @@ target/
 # Added by cargo
 
 /target
+
+src/grpc/*.rs
+
+**/*.rs.bk
+**/*.pb.rs

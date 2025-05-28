@@ -1,6 +1,6 @@
 # 🦀 FeroxDB
 
-**FeroxDB** – *Fast. Persistent. In-memory. Key-Value Store in Rust*  
+**FeroxDB** – _Fast. Persistent. In-memory. Key-Value Store in Rust_  
 A fierce hybrid key-value store written in Rust. Combines the blazing speed of in-memory storage with the durability of file-backed persistence.
 
 ## 🚀 Features
@@ -18,12 +18,30 @@ A fierce hybrid key-value store written in Rust. Combines the blazing speed of i
 FeroxDB/
 ├── src/
 │   ├── bin/
-│   │   └── feroxdb.rs      # Main CLI entry point
+│   │   └── fox.rs          # Main CLI entry point
+│   │   └── server.rs       # gRPC server entry point
+│   ├── grpc/               # generated code from proto
+│   │   └── feroxdb.rs      # generated code from proto
+│   │   └── mod.rs          # grpc module
+│   ├── cache.rs            # In-memory cache implementation
 │   ├── cli.rs              # CLI parser using clap
 │   ├── lib.rs              # Core library interface
-│   ├── cache.rs            # In-memory cache implementation
+│   ├── persistance.rs      # save/ load logic
 │   ├── storage.rs          # File-backed persistence logic
 │   └── types.rs            # Shared types and TTL structs
+├── build.rs
 ├── Cargo.toml
 └── README.md
+```
 
+
+## 🔧 Basic Architecture
+
+```objective
+
+┌────────────┐     CLI Command      ┌────────────┐
+│  fox CLI   │ ───────────────────▶ │ FeroxDB    │
+│ (client)   │      via gRPC        │ Server     │
+└────────────┘                      └────────────┘
+
+```
