@@ -1,17 +1,21 @@
-use std::time::{Duration, Instant};
+use std::time::Duration;
 
+use chrono::{NaiveDateTime, Utc};
+use serde::Serialize;
+
+#[derive(Clone, Debug, Default, Serialize)]
 pub struct Entry {
     pub value: String,
-    pub expires_at: Instant,
+    pub expires_at: NaiveDateTime,
 }
 
 impl Entry {
     pub fn new(value: String, ttl: u64) -> Self {
-        let expires_at = Instant::now() + Duration::from_secs(ttl);
+        let expires_at = Utc::now().naive_utc() + Duration::from_secs(ttl);
         Self { value, expires_at }
     }
 
     pub fn is_expired(&self) -> bool {
-        self.expires_at < Instant::now()
+        self.expires_at < Utc::now().naive_utc()
     }
 }

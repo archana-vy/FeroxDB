@@ -24,3 +24,5 @@ src/grpc/*.rs
 
 **/*.rs.bk
 **/*.pb.rs
+
+.env

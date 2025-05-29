@@ -11,7 +11,7 @@ service FeroxDB {
 message SetRequest {
   string key = 1;
   string value = 2;
-  uint64 ttl = 3;
+  optional uint64 ttl = 3;
 }
 
 message SetResponse {
