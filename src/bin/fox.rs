@@ -1,15 +1,16 @@
 use feroxdb::{
-    server,
     cli::{Cli, Commands},
-    cache::Cache,
+    client::{grpc_get, grpc_set},
+    server,
 };
 
 use clap::Parser;
 
+const DEFAULT_TTL_SECONDS: u64 = 60;
+
 #[tokio::main]
 pub async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let args = Cli::parse();
-    let mut cache = Cache::new();
 
     match args.command {
         Commands::Start => {
@@ -20,15 +21,22 @@ pub async fn main() -> Result<(), Box<dyn std::error::Error>> {
             // Call cache + storage logic here
 
             // cache storage logic
-            cache.set(key, value, ttl);
+            grpc_set(&key, &value, ttl.unwrap_or(DEFAULT_TTL_SECONDS)).await;
         }
         Commands::Get { key } => {
             println!("Get: {}", key);
             // Lookup logic
 
-            let value = cache.get(key);
+            let res = grpc_get(&key).await;
 
-            println!("Value: {:?}", value.unwrap_or("Not Found".to_string()));
+            println!(
+                "Value: {:?}",
+                if res.found {
+                    res.value
+                } else {
+                    "Not Found".to_string()
+                }
+            );
         }
         Commands::Save => {
             println!("Persisting store...");
