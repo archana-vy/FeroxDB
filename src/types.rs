@@ -1,9 +1,9 @@
 use std::time::Duration;
 
 use chrono::{NaiveDateTime, Utc};
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
-#[derive(Clone, Debug, Default, Serialize)]
+#[derive(Clone, Debug, Default, Deserialize, Serialize)]
 pub struct Entry {
     pub value: String,
     pub expires_at: NaiveDateTime,

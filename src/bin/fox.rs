@@ -1,6 +1,6 @@
 use feroxdb::{
     cli::{Cli, Commands},
-    client::{grpc_get, grpc_set},
+    client::{grpc_get, grpc_save, grpc_set},
     server,
 };
 
@@ -41,6 +41,9 @@ pub async fn main() -> Result<(), Box<dyn std::error::Error>> {
         Commands::Save => {
             println!("Persisting store...");
             // Save logic
+            let res = grpc_save().await;
+
+            println!("Save response: {:?}", res);
         }
     }
 

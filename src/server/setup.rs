@@ -1,78 +1,11 @@
-use crate::grpc::feroxdb::ferox_db_server::{FeroxDb, FeroxDbServer};
-use crate::grpc::feroxdb::{
-    GetRequest, GetResponse, SaveRequest, SaveResponse, SetRequest, SetResponse,
-};
-use crate::handlers::{handle_get, handle_save, handle_set};
-use crate::types::Entry;
-use chrono::Utc;
-use std::collections::HashMap;
-use std::sync::{Arc, Mutex};
-use std::time::Duration;
+use crate::grpc::feroxdb::ferox_db_server::FeroxDbServer;
+use crate::handlers::handle_save;
+use crate::server::service::FeroxDbService;
+use std::sync::Arc;
 use tokio::signal;
-use tonic::{Request, Response, Status, transport::Server};
+use tonic::transport::Server;
 
 use crate::server::config::FeroxDbConfig;
-
-#[derive(Clone, Debug, Default)]
-pub struct FeroxDbService {
-    config: FeroxDbConfig,
-    cache: Arc<Mutex<HashMap<String, Entry>>>,
-}
-
-impl FeroxDbService {
-    fn new(config: FeroxDbConfig) -> Self {
-        Self {
-            config: config,
-            cache: Arc::new(Mutex::new(HashMap::new())),
-        }
-    }
-}
-
-#[tonic::async_trait]
-impl FeroxDb for FeroxDbService {
-    async fn set(&self, request: Request<SetRequest>) -> Result<Response<SetResponse>, Status> {
-        let SetRequest { key, value, ttl } = request.into_inner();
-
-        let value = Entry {
-            value,
-            expires_at: Utc::now().naive_utc() + Duration::from_secs(ttl),
-        };
-
-        let cache = &self.cache;
-        let storage = self.config.get_storage_path();
-
-        let res = handle_set(key, value, cache, storage)
-            .await
-            .expect("Failed to set value");
-
-        Ok(Response::new(res))
-    }
-
-    async fn get(&self, request: Request<GetRequest>) -> Result<Response<GetResponse>, Status> {
-        let GetRequest { key } = request.into_inner();
-
-        let cache = &self.cache;
-        let storage = self.config.get_storage_path();
-
-        let res = handle_get(key, cache, storage)
-            .await
-            .expect("Failed to get value for key")
-            .unwrap_or(GetResponse {
-                value: "".to_string(),
-                found: false,
-            });
-
-        Ok(Response::new(res))
-    }
-
-    async fn save(&self, _request: Request<SaveRequest>) -> Result<Response<SaveResponse>, Status> {
-        // TODO: save to disk here
-        let _storage = self.config.get_storage_path();
-        Ok(Response::new(SaveResponse {
-            status: "SAVED".to_string(),
-        }))
-    }
-}
 
 pub async fn start_server() -> Result<(), Box<dyn std::error::Error>> {
     let config = FeroxDbConfig::load();
