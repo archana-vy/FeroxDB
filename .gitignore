@@ -26,3 +26,5 @@ src/grpc/*.rs
 **/*.pb.rs
 
 .env
+
+local/*

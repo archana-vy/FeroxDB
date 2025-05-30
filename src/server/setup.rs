@@ -1,5 +1,5 @@
 use crate::grpc::feroxdb::ferox_db_server::FeroxDbServer;
-use crate::handlers::handle_save;
+use crate::handlers::{handle_cleanup, handle_save};
 use crate::server::service::FeroxDbService;
 use std::sync::Arc;
 use tokio::signal;
@@ -19,6 +19,12 @@ pub async fn start_server() -> Result<(), Box<dyn std::error::Error>> {
         app_data.config.get_grpc_port()
     )
     .parse()?;
+
+    let cache = Arc::clone(&app_data.cache);
+
+    tokio::spawn(async move {
+        handle_cleanup(cache).await;
+    });
 
     println!("FeroxDB Server running on {}", addr);
 
